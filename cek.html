@@ -1,0 +1,11 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cek PWA</title><link rel="manifest" href="manifest.webmanifest"><style>body{font:16px system-ui;margin:16px;line-height:1.5}p{margin:8px 0;padding:10px;border-radius:10px;background:#eee}.ok{background:#d9f5df}.no{background:#fbd9d9}</style></head><body><h2>Cek PWA</h2><div id="o"></div><script>
+const o=document.getElementById('o'),add=(t,ok)=>{const p=document.createElement('p');p.className=ok?'ok':'no';p.textContent=(ok?'✅ ':'❌ ')+t;o.appendChild(p)};
+(async()=>{
+const https=location.protocol==='https:'||location.hostname==='localhost';add('Alamat memakai HTTPS ('+location.protocol+')',https);
+const ua=navigator.userAgent;add('Browser: '+(/SamsungBrowser/.test(ua)?'Samsung Internet (menu: Tambahkan halaman ke → Layar utama)':/Chrome/.test(ua)?'Chrome':'lainnya')+(/Instagram|FBAN|FBAV|WhatsApp|Line\//.test(ua)?' — ini browser di dalam aplikasi, buka lewat Chrome':''),/Chrome/.test(ua)&&!/SamsungBrowser|Instagram|FBAN|FBAV/.test(ua));
+try{const r=await fetch('manifest.webmanifest');const m=await r.json();add('manifest.webmanifest terbaca ('+r.status+'), '+m.icons.length+' ikon',r.ok)}catch(e){add('manifest.webmanifest gagal dibaca: '+e,false)}
+for(const f of['icons/icon-192.png','icons/icon-512.png','icons/icon-512-maskable.png','sw.js','index.html']){try{const r=await fetch(f);add(f+' ('+r.status+')',r.ok)}catch(e){add(f+' tidak bisa dimuat',false)}}
+if('serviceWorker' in navigator){try{const g=await navigator.serviceWorker.register('sw.js',{scope:'./'});await navigator.serviceWorker.ready;add('Service worker aktif (scope '+g.scope+')',true)}catch(e){add('Service worker gagal: '+e.message,false)}}else add('Browser tidak mendukung service worker',false);
+add('Sudah dibuka sebagai aplikasi terpasang',matchMedia('(display-mode: standalone)').matches);
+let fired=false;addEventListener('beforeinstallprompt',()=>{fired=true});await new Promise(r=>setTimeout(r,2500));add(fired?'Chrome siap menawarkan instal':'Chrome belum menawarkan instal (tutup tab, buka lagi, lalu cek ulang; mungkin sudah terpasang)',fired);
+})();</script></body></html>
